@@ -1,32 +1,28 @@
 export const Leaderboard = [
     {
-        name: "OxShishh",
-        img: "https://lh5.googleusercontent.com/sZniCMLQ5BCYoIWdZ3Zg6vdLX0zcVGR0uE6eqFewMI4tyPXcbjwl5G0oMiW8ZG5p7A3qbZGTsDrHikY19tOzsXzt5xjOvv2tQQcYspuLoj-4XNERPAF8NZU8dMXD6mj92136o8qv6A1y4LiZAKN9i9w",
-        dt: "2017-02-10"
+        name: "OxPunkyClw",
+        img: "/punky.jpeg",
+        dt: "2013-01-20"
     },
     {
-        name: "OxNullnono",
-        img: "/OxNullNono.jpeg",
-        dt: "2019-01-01"
+        name: "OxthxBitso",
+        img: "/bisto.jpeg",
+        dt: "2016-07-17"
     },
     {
-        name: "Oxwepoooo",
-        img: "/Oxwepooo.jpeg",
-        dt: "2019-08-07"
+        name: "OxLoaficat",
+        img: "/loaf.jpeg",
+        dt: "2021-09-01"
     },
     {
-        name: "OxNullBisto",
-        img: "https://www.ccn.com/wp-content/uploads/2023/07/bitcoin-ordinals-cover-1536x864.webp",
-        dt: "2020-10-23"
+        name: "Ox420anniv",
+        img: "/anniv.jpeg",
+        dt: "2022-04-20"
     },
     {
-        name: "OxNullOrdinals",
-        img: "https://www.altcoinbuzz.io/wp-content/uploads/2023/02/Youtube-Thumbnails-Nov-2021-38.jpg",
-        dt: "2021-01-22"
-    },
-    {
-        name: "OxOGinals",
-        img: "https://news.artnet.com/app/news-upload/2023/02/ordinal-punks1-1024x980.jpg",
-        dt: "2022-01-21"
+        name: "OxNullWifh",
+        img: "/wif.jpeg",
+        dt: "2023-03-26"
     }
 ]
+

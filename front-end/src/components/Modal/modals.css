@@ -10,7 +10,7 @@ body.active-modal {
     top: 50%; 
     left: 50%; 
     transform: translate(-50%, -50%); 
-    font-size: 18px;
+    font-size: 16px;
     z-index: 10; 
 }
 
@@ -25,7 +25,7 @@ body.active-modal {
 }
 
 .overlay {
-    background: rgba(49,49,49,0.8);
+    background: rgba(49, 49, 49, 0.8);
 
 }
 .modal-content {
@@ -34,11 +34,12 @@ body.active-modal {
     left: 50%;
     transform: translate(-50%, -50%);
     line-height: 1.4;
-    background: white;
+    background: rgba(148, 148, 148, 0.7);
     padding: 14px 28px;
     border-radius: 3px;
     max-width: 5000px;
     min-width: 1000px;
+    border-radius: 2%;
 }
 
 .modal-content img {

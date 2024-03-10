@@ -6,13 +6,13 @@
 }
 
 :root{
-    --color-dark: #dd7813;
-    --color-light: #dd7813;
+    --color-dark: #f5a623;
+    --color-light: #231202;
 }
 
 #main{  
     display: flex;
-    background-color: #282c34;
+    background-color: #140b01;
     align-items: center;
     height: 100vh;
     padding-right: 50px;
@@ -20,14 +20,16 @@
 
 .board {
     text-align: center;
-    background-color: #282c34;
+    background-color: #140b01;
     /*padding-right: 50px;*/
 }
 
 .board .leaderboard{
-    color: white;
+    color: #f5a623;
     display: flex;
     justify-content: flex-end;
+    padding-right: 30px;
+    padding-top: 20px;
     margin-bottom: 1em;
 }
 
@@ -41,7 +43,7 @@
     border: 1px solid var(--color-light);
     padding: .5em 2em;
     border-radius: 50px;
-    background-color: #61dafb;
+    background-color: #ae5807;
     /*justify-content: flex-end;*/
     cursor: pointer;
 }
@@ -88,7 +90,7 @@
 #profile .flex .info{
     text-align: right;
     padding: 1em;
-    color: rgb(182, 141, 46);
+    color: rgb(176, 85, 5);
     padding-right: 50px;
 }
 

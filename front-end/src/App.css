@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #3f210500;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -23,13 +23,18 @@
   height : 100vh;
   padding-left: 50px;
   font-size: calc(10px + 2vmin);
+  color: rgb(245, 166, 35);
+}
+.App-header.custom-card {
   color: white;
 }
 
-.App-header.wallet{
-  justify-content: flex-start;
+.App-header.custom-card .App-link {
   color: white;
-  margin-bottom: 1em;
+}
+
+.custom-radio-group .ant-radio-wrapper .ant-radio + span {
+  color: white;
 }
 
 .App-link {

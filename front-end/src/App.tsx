@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { Button, Card, Input, Radio } from "antd";
-import Board from './components/board';
+import Board from './components/board.js';
 import './components/style.css';
 import ParticleComponents from './components/Particles.js';
 import Modal from './components/Modal/modals';
 import './components/Modal/modals.css';
+import Board2 from "./components/board2";
 
 
 
@@ -26,6 +27,13 @@ function App() {
   const [showBoard, setShowBoard] = useState(false);
 
   const [showModal, setModal] = useState(false);
+
+  const [isLeaderboardOne, setIsLeaderboardOne] = useState(true);
+
+  // Function to toggle the leaderboard
+  const toggleLeaderboard = () => {
+    setIsLeaderboardOne(!isLeaderboardOne);
+  };
 
   const getBasicInfo = async () => {
     const unisat = (window as any).unisat;
@@ -136,33 +144,34 @@ function App() {
           >
             <Card
               size="small"
-              title="Description"
-              style={{ width: 300, margin: 10 }}
+              title= {<span style={{ color: 'white' }}>Description</span>}
+              style={{ width: 300, margin: 10, borderRadius: 30, backgroundColor: 'rgba(65, 33, 5, 0.5)', borderBlockColor: 'rgba(65, 33, 5, 0.5)'}}
             >
               <div style={{ textAlign: "left", marginTop: 10 }}>
-                <div style={{ fontWeight: "bold" }}>Address:</div>
-                <div style={{ wordWrap: "break-word" }}>{address}</div>
+                <div style={{ fontWeight: "bold", color:'white' }}>Address:</div>
+                <div style={{ wordWrap: "break-word", color:'white' }}>{address}</div>
               </div>
 
               <div style={{ textAlign: "left", marginTop: 10 }}>
-                <div style={{ fontWeight: "bold" }}>PublicKey:</div>
-                <div style={{ wordWrap: "break-word" }}>{publicKey}</div>
+                <div style={{ fontWeight: "bold", color:'white'}}>PublicKey:</div>
+                <div style={{ wordWrap: "break-word", color:'white' }}>{publicKey}</div>
               </div>
 
               <div style={{ textAlign: "left", marginTop: 10 }}>
-                <div style={{ fontWeight: "bold" }}>Balance: (Satoshis)</div>
-                <div style={{ wordWrap: "break-word" }}>{balance.total}</div>
+                <div style={{ fontWeight: "bold", color:'white' }}>Balance: (Satoshis)</div>
+                <div style={{ wordWrap: "break-word", color:'white' }}>{balance.total}</div>
               </div>
             </Card>
 
             <Card
+              className="custom-card"
               size="small"
-              title="Switch Network"
-              style={{ width: 300, margin: 10 }}
+              title={<span style={{ color: 'white' }}>Claim OGinals</span>}
+              style={{ width: 300, margin: 10, borderRadius: 30,  backgroundColor: 'rgba(65, 33, 5, 0.5)', borderBlockColor: 'rgba(65, 33, 5, 0.5)' }}
             >
               <div style={{ textAlign: "left", marginTop: 10 }}>
-                <div style={{ fontWeight: "bold" }}>Network:</div>
-                <Radio.Group
+                <div style={{ fontWeight: "bold" , color:'white'}}>Network:</div>
+                <Radio.Group className="custom-radio-group"
                   onChange={async (e) => {
                     const network = await unisat.switchNetwork(e.target.value);
                   }}
@@ -175,11 +184,11 @@ function App() {
 
             <Card
               size="small"
-              title="Claim OGinals"
-              style={{ width: 300, margin: 10 }}
+              title={<span style={{ color: 'white' }}>Claim OGinals</span>}
+              style={{ width: 300, margin: 10, borderRadius: 30, backgroundColor: 'rgba(65, 33, 5, 0.5)', borderBlockColor: 'rgba(65, 33, 5, 0.5)' }}
             >
               <div style={{ textAlign: "left", marginTop: 10 }}>
-                <div style={{ fontWeight: "bold" }}>OGinal Username:</div>
+                <div style={{ fontWeight: "bold", color: 'white'}}>OGinal Username:</div>
                 <Input
                   style={{ width: 200 }}
                   onChange={(e) => {
@@ -187,14 +196,19 @@ function App() {
                   }}
                 />
               </div>
-              <div style={{ textAlign: "left", marginTop: 10 }}>
-                <Button onClick={handleClaimClick}> Claim</Button>
+              <div style={{ textAlign: "left", marginTop: 10}}>
+                <Button 
+                  style={{ width: 200, borderRadius: 30 }}
+                onClick={handleClaimClick}> 
+                Claim
+                </Button>
               </div>
             </Card>
           </div>
         ) : (
           <div>
             <Button
+              style={{ borderRadius: 30, backgroundColor: 'rgba(65, 33, 5, 0.5)', borderBlockColor: 'rgba(65, 33, 5, 0.5)', color: 'white' }}
               onClick={async () => {
                 const result = await unisat.requestAccounts();
                 handleAccountsChanged(result);
@@ -205,8 +219,8 @@ function App() {
           </div>
         )}
       </header>
-      {showBoard && <Board /> } 
-      {showModal && <Modal />}
+      {showBoard && <Board />  && (isLeaderboardOne ? <Board /> : <Board2 />)} 
+      {showModal && <Modal onClose={toggleLeaderboard}/>}
     </div>
   );
 }
