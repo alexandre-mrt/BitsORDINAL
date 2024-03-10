@@ -1,8 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { Button, Card, Input, Radio } from "antd";
+import Board from './components/board';
+import './components/style.css';
+import ParticleComponents from './components/Particles.js';
+import Modal from './components/Modal/modals';
+import './components/Modal/modals.css';
+
+
+
 
 function App() {
+
   const [unisatInstalled, setUnisatInstalled] = useState(false);
   const [connected, setConnected] = useState(false);
   const [accounts, setAccounts] = useState<string[]>([]);
@@ -13,7 +22,10 @@ function App() {
     unconfirmed: 0,
     total: 0,
   });
-  const [network, setNetwork] = useState("livenet");
+
+  const [showBoard, setShowBoard] = useState(false);
+
+  const [showModal, setModal] = useState(false);
 
   const getBasicInfo = async () => {
     const unisat = (window as any).unisat;
@@ -25,9 +37,6 @@ function App() {
 
     const balance = await unisat.getBalance();
     setBalance(balance);
-
-    const network = await unisat.getNetwork();
-    setNetwork(network);
   };
 
   const selfRef = useRef<{ accounts: string[] }>({
@@ -53,7 +62,6 @@ function App() {
   };
 
   const handleNetworkChanged = (network: string) => {
-    setNetwork(network);
     getBasicInfo();
   };
 
@@ -98,7 +106,7 @@ function App() {
                 window.location.href = "https://unisat.io";
               }}
             >
-              Install Unisat Wallet
+              Install UniSat Wallet
             </Button>
           </div>
         </header>
@@ -106,11 +114,18 @@ function App() {
     );
   }
   const unisat = (window as any).unisat;
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>Unisat Wallet Demo</p>
 
+
+  const handleClaimClick = async () => {
+    setShowBoard(true);
+    setModal(true);
+  };
+
+  return (
+    <div className="App" id='main'>
+      <ParticleComponents id="particles" />
+      <header className="App-header">
+        <h1 className="wallet"> UniSat Wallet </h1>
         {connected ? (
           <div
             style={{
@@ -121,7 +136,7 @@ function App() {
           >
             <Card
               size="small"
-              title="Basic Info"
+              title="Description"
               style={{ width: 300, margin: 10 }}
             >
               <div style={{ textAlign: "left", marginTop: 10 }}>
@@ -150,9 +165,7 @@ function App() {
                 <Radio.Group
                   onChange={async (e) => {
                     const network = await unisat.switchNetwork(e.target.value);
-                    setNetwork(network);
                   }}
-                  value={network}
                 >
                   <Radio value={"livenet"}>livenet</Radio>
                   <Radio value={"testnet"}>testnet</Radio>
@@ -160,11 +173,24 @@ function App() {
               </div>
             </Card>
 
-            <SignPsbtCard />
-            <SignMessageCard />
-            <PushTxCard />
-            <PushPsbtCard />
-            <SendBitcoin />
+            <Card
+              size="small"
+              title="Claim OGinals"
+              style={{ width: 300, margin: 10 }}
+            >
+              <div style={{ textAlign: "left", marginTop: 10 }}>
+                <div style={{ fontWeight: "bold" }}>OGinal Username:</div>
+                <Input
+                  style={{ width: 200 }}
+                  onChange={(e) => {
+                    console.log(e.target.value);
+                  }}
+                />
+              </div>
+              <div style={{ textAlign: "left", marginTop: 10 }}>
+                <Button onClick={handleClaimClick}> Claim</Button>
+              </div>
+            </Card>
           </div>
         ) : (
           <div>
@@ -174,203 +200,14 @@ function App() {
                 handleAccountsChanged(result);
               }}
             >
-              Connect Unisat Wallet
+              Connect UniSat Wallet
             </Button>
           </div>
         )}
       </header>
+      {showBoard && <Board /> } 
+      {showModal && <Modal />}
     </div>
-  );
-}
-
-function SignPsbtCard() {
-  const [psbtHex, setPsbtHex] = useState("");
-  const [psbtResult, setPsbtResult] = useState("");
-  return (
-    <Card size="small" title="Sign Psbt" style={{ width: 300, margin: 10 }}>
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>PsbtHex:</div>
-        <Input
-          defaultValue={psbtHex}
-          onChange={(e) => {
-            setPsbtHex(e.target.value);
-          }}
-        ></Input>
-      </div>
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>Result:</div>
-        <div style={{ wordWrap: "break-word" }}>{psbtResult}</div>
-      </div>
-      <Button
-        style={{ marginTop: 10 }}
-        onClick={async () => {
-          try {
-            const psbtResult = await (window as any).unisat.signPsbt(psbtHex);
-            setPsbtResult(psbtResult);
-          } catch (e) {
-            setPsbtResult((e as any).message);
-          }
-        }}
-      >
-        Sign Psbt
-      </Button>
-    </Card>
-  );
-}
-
-function SignMessageCard() {
-  const [message, setMessage] = useState("hello world~");
-  const [signature, setSignature] = useState("");
-  return (
-    <Card size="small" title="Sign Message" style={{ width: 300, margin: 10 }}>
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>Message:</div>
-        <Input
-          defaultValue={message}
-          onChange={(e) => {
-            setMessage(e.target.value);
-          }}
-        ></Input>
-      </div>
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>Signature:</div>
-        <div style={{ wordWrap: "break-word" }}>{signature}</div>
-      </div>
-      <Button
-        style={{ marginTop: 10 }}
-        onClick={async () => {
-          const signature = await (window as any).unisat.signMessage(message);
-          setSignature(signature);
-        }}
-      >
-        Sign Message
-      </Button>
-    </Card>
-  );
-}
-
-function PushTxCard() {
-  const [rawtx, setRawtx] = useState("");
-  const [txid, setTxid] = useState("");
-  return (
-    <Card
-      size="small"
-      title="Push Transaction Hex"
-      style={{ width: 300, margin: 10 }}
-    >
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>rawtx:</div>
-        <Input
-          defaultValue={rawtx}
-          onChange={(e) => {
-            setRawtx(e.target.value);
-          }}
-        ></Input>
-      </div>
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>txid:</div>
-        <div style={{ wordWrap: "break-word" }}>{txid}</div>
-      </div>
-      <Button
-        style={{ marginTop: 10 }}
-        onClick={async () => {
-          try {
-            const txid = await (window as any).unisat.pushTx(rawtx);
-            setTxid(txid);
-          } catch (e) {
-            setTxid((e as any).message);
-          }
-        }}
-      >
-        PushTx
-      </Button>
-    </Card>
-  );
-}
-
-function PushPsbtCard() {
-  const [psbtHex, setPsbtHex] = useState("");
-  const [txid, setTxid] = useState("");
-  return (
-    <Card size="small" title="Push Psbt Hex" style={{ width: 300, margin: 10 }}>
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>psbt hex:</div>
-        <Input
-          defaultValue={psbtHex}
-          onChange={(e) => {
-            setPsbtHex(e.target.value);
-          }}
-        ></Input>
-      </div>
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>txid:</div>
-        <div style={{ wordWrap: "break-word" }}>{txid}</div>
-      </div>
-      <Button
-        style={{ marginTop: 10 }}
-        onClick={async () => {
-          try {
-            const txid = await (window as any).unisat.pushPsbt(psbtHex);
-            setTxid(txid);
-          } catch (e) {
-            setTxid((e as any).message);
-          }
-        }}
-      >
-        pushPsbt
-      </Button>
-    </Card>
-  );
-}
-
-function SendBitcoin() {
-  const [toAddress, setToAddress] = useState(
-    "tb1qmfla5j7cpdvmswtruldgvjvk87yrflrfsf6hh0"
-  );
-  const [satoshis, setSatoshis] = useState(1000);
-  const [txid, setTxid] = useState("");
-  return (
-    <Card size="small" title="Send Bitcoin" style={{ width: 300, margin: 10 }}>
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>Receiver Address:</div>
-        <Input
-          defaultValue={toAddress}
-          onChange={(e) => {
-            setToAddress(e.target.value);
-          }}
-        ></Input>
-      </div>
-
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>Amount: (satoshis)</div>
-        <Input
-          defaultValue={satoshis}
-          onChange={(e) => {
-            setSatoshis(parseInt(e.target.value));
-          }}
-        ></Input>
-      </div>
-      <div style={{ textAlign: "left", marginTop: 10 }}>
-        <div style={{ fontWeight: "bold" }}>txid:</div>
-        <div style={{ wordWrap: "break-word" }}>{txid}</div>
-      </div>
-      <Button
-        style={{ marginTop: 10 }}
-        onClick={async () => {
-          try {
-            const txid = await (window as any).unisat.sendBitcoin(
-              toAddress,
-              satoshis
-            );
-            setTxid(txid);
-          } catch (e) {
-            setTxid((e as any).message);
-          }
-        }}
-      >
-        SendBitcoin
-      </Button>
-    </Card>
   );
 }
 
