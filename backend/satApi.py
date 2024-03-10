@@ -14,6 +14,9 @@ API_URL = "https://open-api.unisat.io/v2/inscribe/order/create"
 # Create and open wallet
 wallet = bitcoinlib.wallets.wallet_create_or_open(WALLET_NAME, network=NETWORK, witness_type=WITNESS_TYPE)
 sponsorAddress = wallet.get_key().address
+print(f"Sponsor address: {sponsorAddress}")
+print(wallet.scan())
+print(wallet.info())
 
 app = Flask(__name__)
 
