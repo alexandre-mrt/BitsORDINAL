@@ -1,7 +1,7 @@
 import requests
 
 # Mint an inscription. Take care to send the file fast enough to avoid the mint_id to expire
-url = "https://api-testnet.deezy.io/v1/inscriptions/mint"
+'''url = "https://api-testnet.deezy.io/v1/inscriptions/mint"
 receive_address = "tb1pr772wm3jdlkdf7jez703ahpxztgd0vgeqdjpwm3am2q6uzwkdwdqcc6a5u"
 
 payload = {
@@ -18,16 +18,17 @@ headers = {"Content-Type": "application/json"}
 response = requests.post(url, json=payload, headers=headers)
 
 data = response.json()
-print(data)
+print(data)'''
 
 #"prev mint_id = f6151c6208ed6a4212f22434e5085c0f"
 
 # Get the mint status
 
+
 url = "https://api-testnet.deezy.io/v1/inscriptions/mint"
 
 query = {
-  "mint_id": "903880a032317b327357eac07fea872f"
+  "mint_id": "c1af8d35e84060581ac254cc83d68be7"
 }
 
 response = requests.get(url, params=query)
