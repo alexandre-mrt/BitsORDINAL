@@ -1,45 +1,41 @@
-from bitcoinlib.wallets import Wallet, wallet_create_or_open
-from bitcoinlib.transactions import Transaction, Output
+import bitcoinlib
+import bitcoinlib.networks as networks
+from bitcoinlib.wallets import wallet_create_or_open
 from flask import Flask, request, jsonify
 import os
 
 # Environment variable for the private key
-private_key = os.getenv('SPONSORED_WALLET_PRIVATE_KEY')
-network = 'bitcoin'
+network = 'testnet'
+
+wallet = wallet_create_or_open("Sponsorising", network= network)
+print(wallet.scan())
+print(wallet.info())
+
+private_key = wallet.get_key()
+print(wallet.get_key())
+
 
 app = Flask(__name__)
-
-def create_transaction(wallet, recipient_address, amount):
-    # Create a new transaction (Not broadcasted yet)
-    outputs = [Output(amount, recipient_address, 'btc')]
-    return Transaction(wallet, outputs=outputs)
-
-def sign_transaction(wallet, transaction):
-    # Sign the transaction with the wallet's private keys
-    return wallet.sign_transaction(transaction)
-
-def broadcast_transaction(wallet, transaction):
-    # Broadcast the signed transaction to the Bitcoin network
-    return wallet.send_raw(transaction)
 
 @app.route('/mint', methods=['POST'])
 def mint():
     data = request.get_json()
     user_address = data.get('user_address')
     amount = data.get('amount')
-    
+
     if not user_address or not amount:
         return jsonify({"status": "error", "message": "Invalid user address or amount"}), 400
 
     try:
         # Initialize wallet
-        wallet = wallet_create_or_open("SponsoredWallet", keys=private_key, network=network)
+        print(wallet.scan())
+        print(wallet.info())
+        print(wallet.get_key())
 
-        # Create, sign, and broadcast the transaction
-        tx = create_transaction(wallet, user_address, amount)
-        signed_tx = sign_transaction(wallet, tx)
-        txid = broadcast_transaction(wallet, signed_tx)
-        
+        # Create, sign, and send the transaction in one step
+        # Replace `send_to` with the actual function name and its required parameters
+        txid = wallet.send_to(user_address, amount)
+
         return jsonify({"status": "success", "transaction_id": txid}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
