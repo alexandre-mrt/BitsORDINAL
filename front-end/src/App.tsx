@@ -119,6 +119,7 @@ function App() {
   const handleClaimClick = async () => {
     setShowBoard(true);
     setModal(true);
+    
   };
 
   return (

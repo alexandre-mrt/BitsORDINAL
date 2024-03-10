@@ -1,87 +1,123 @@
 import requests
 import json
+from math import ceil, floor
+import bitcoinlib
+from bitcoinlib.wallets import Wallet
+from flask import Flask, request, jsonify
 
-# Set the URL for the API endpoint
-url = "https://open-api.unisat.io/v2/inscribe/order/create"
+# Constants
+NETWORK = 'testnet'
+WALLET_NAME = "Bitso"
+WITNESS_TYPE = 'segwit'
+API_URL = "https://open-api.unisat.io/v2/inscribe/order/create"
 
-# Replace these with the actual values you want to send
-'''
-const address = ''; // the receiver address
-const inscriptionBalance = 546; // the balance in each inscription
-const fileCount = 1000; // the fileCount
-const fileSize = 1000; // the total size of all files
-const contentTypeSize = 100; // the size of contentType
-const feeRate = 10; // the feeRate
-const feeFileSize = 100; // the total size of first 25 files
-const feeFileCount = 25 // do not change this
-const devFee = 1000; // the fee for developer
+# Create and open wallet
+wallet = bitcoinlib.wallets.wallet_create_or_open(WALLET_NAME, network=NETWORK, witness_type=WITNESS_TYPE)
+sponsorAddress = wallet.get_key().address
 
-const balance = inscriptionBalance * fileCount;
+app = Flask(__name__)
 
-let addrSize = 25+1; // p2pkh
-if(address.indexOf('bc1q')==0 || address.indexOf('tb1q')==0){
-    addrSize = 22+1;
-}else if(address.indexOf('bc1p')==0 || address.indexOf('tb1p')==0){
-    addrSize = 34+1;
-}else if(address.indexOf('2')==0 || address.indexOf('3')==0){
-    addrSize = 23+1;
-}
+def calculateFees(sponsor):
+    """
+    Calculate the fees required for a transaction.
+    """
+    address = sponsor
+    inscription_balance = 546
+    file_count = 1
+    file_size = 100
+    content_type_size = 100
+    fee_rate = 10
+    fee_file_size = 100
+    fee_file_count = 25
+    dev_fee = 1000
 
-const baseSize = 88;
-let networkSats = Math.ceil(((fileSize+contentTypeSize) / 4 + ( baseSize+8+addrSize+8+23)) * feeRate);
-if(fileCount>1){
-    networkSats = Math.ceil(((fileSize+contentTypeSize) / 4 + (baseSize+8+addrSize+(35+8)*(fileCount-1)+ 8+23 +(baseSize+8+addrSize+0.5)*(fileCount-1) )) * feeRate);
-}
-let networkSatsByFeeCount = Math.ceil(((feeFileSize+contentTypeSize) / 4 + ( baseSize+8+addrSize+8+23)) * feeRate);
-if(fileCount>1){
-    networkSatsByFeeCount = Math.ceil(((( feeFileSize)+contentTypeSize*(feeFileCount/fileCount)) / 4 + (baseSize+8+addrSize+(35+8)*(fileCount-1)+ 8+23 +(baseSize+8+addrSize+0.5)*Math.min(fileCount-1,feeFileCount-1) )) * feeRate);
-}
+    balance = inscription_balance * file_count
+    addr_size = 26  # default p2pkh size
 
-const baseFee = 1999 * Math.min(fileCount, feeFileCount); // 1999 base fee for top 25 files
-const floatFee = Math.ceil(networkSatsByFeeCount * 0.0499); // 4.99% extra miner fee for top 25 transations
-const serviceFee = Math.floor(baseFee + floatFee);
+    if address.startswith('bc1q') or address.startswith('tb1q'):
+        addr_size = 23
+    elif address.startswith('bc1p') or address.startswith('tb1p'):
+        addr_size = 35
+    elif address.startswith('2') or address.startswith('3'):
+        addr_size = 24
 
-const total = balance + networkSats + serviceFee; 
-const truncatedTotal = Math.floor((total) / 1000) * 1000; // truncate
-const amount = truncatedTotal + devFee; // add devFee at the end
+    base_size = 88
+    network_sats = calculateNetworkSats(file_size, content_type_size, addr_size, base_size, file_count, fee_rate)
+    network_sats_by_fee_count = calculateNetworkSats(fee_file_size, content_type_size, addr_size, base_size, file_count, fee_rate, fee_file_count)
 
-console.log("The final amount need to pay: ",amount)
-'''
-# Will make a call to the front to get the connected addres
-#TODO
-receive_address = "your_receive_address_here"
-dev_address = "02eeeab1bb5023e1e127efe565cd5aa92a4f9d339bd335abdcf3ee36c37df2c0b7"
-data_url = "https://i0.wp.com/crncy.com.au/wp-content/uploads/Screenshot-2024-03-07-at-6.07.10-pm.png?w=1066&ssl=1" # This should be a base64 encoded string
+    base_fee = 1999 * min(file_count, fee_file_count)
+    float_fee = ceil(network_sats_by_fee_count * 0.0499)
+    service_fee = floor(base_fee + float_fee)
 
-# Create the data payload as a dictionary
-data = {
-    "receiveAddress": receive_address,
-    "feeRate": 1,
-    "outputValue": 546,
-    "files": [
-        {
-            "username": "BitsOjizz",
-            "origin_account": receive_address,
-            "block_height": 1,
-            "dataURL": data_url
-        }
-    ],
-    "devAddress": dev_address,
-    "devFee": 0
-}
+    total = balance + network_sats + service_fee
+    truncated_total = floor(total / 1000) * 1000
+    amount = truncated_total + dev_fee
 
-# Set the correct headers for a JSON post request
-headers = {
-    'Content-Type': 'application/json'
-}
+    print("The final amount need to pay: ", amount)
+    return amount
 
-# Make the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
+def calculateNetworkSats(size, content_size, addr_size, base_size, count, rate, fee_count=None):
+    """
+    Helper function to calculate network sats.
+    """
+    if fee_count is None:
+        fee_count = count
 
-# Check if the request was successful
-if response.status_code == 200:
-    print("Order created successfully.")
-    print(response.json())  # Assuming the API returns JSON data
-else:
-    print("Failed to create order. Status code:", response.status_code)
-    print("Response:", response.text)
+    network_sats = ((size + content_size) / 4 + (base_size + 8 + addr_size + 8 + 23)) * rate
+    if count > 1:
+        network_sats = (((size) + content_size * (fee_count / count)) / 4 + (base_size + 8 + addr_size + (35 + 8) * (count - 1) + 8 + 23 + (base_size + 8 + addr_size + 0.5) * min(count - 1, fee_count - 1))) * rate
+
+    return ceil(network_sats)
+
+def mintOGest(customerAddress, username, sponsor):
+    """
+    Create an order and get the pay address and amount to pay.
+    """
+    data = {
+        "receiveAddress": customerAddress,
+        "feeRate": calculateFees(sponsor),
+        "outputValue": 546,
+        "files": [{"username": username, "origin_account": customerAddress, "date": 1}],
+        "devAddress": sponsor,
+        "devFee": 0
+    }
+
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(API_URL, headers=headers, data=json.dumps(data))
+
+    if response.status_code == 200:
+        response_data = response.json()
+        return response_data['data']['payAddress'], response_data['data']['amount']
+    else:
+        print(f"Failed to create order. Status code: {response.status_code}, Response: {response.text}")
+        return None, 0
+
+@app.route('/mint', methods=['POST'])
+def mint():
+    """
+    Endpoint to handle minting requests.
+    """
+    data = request.get_json()
+    
+    customer_address = data.get('customer_address')
+    name = data.get('name')
+
+    if not customer_address or not name:
+        return jsonify({"status": "error", "message": "Invalid address or name"}), 400
+
+    #pay_address, amount = mintOGest(customer_address, name, sponsorAddress) Imagine the API is working 
+    pay_address = "tb1q3m9hl0l2k6nn76gygaczuzcq72dapx6rjzy9jr"
+    amount = 10000 # in sats
+
+    if not pay_address:
+        return jsonify({"status": "error", "message": "Failed to create order"}), 500
+
+    try:
+        tx = wallet.send_to(pay_address, amount, network=NETWORK)
+        wallet.scan()
+        return jsonify({"status": "success", "transaction": {"txid": tx.txid, "amount": amount, "pay_address": pay_address}}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True, host = 'localhost', port = 9000)

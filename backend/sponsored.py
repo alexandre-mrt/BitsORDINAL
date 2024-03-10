@@ -3,6 +3,7 @@ import bitcoinlib.networks as networks
 from bitcoinlib.wallets import wallet_create_or_open
 from flask import Flask, request, jsonify
 import os
+import satApi 
 
 # Environment variable for the private key
 network = 'testnet'
