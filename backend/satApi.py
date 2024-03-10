@@ -16,7 +16,6 @@ wallet = bitcoinlib.wallets.wallet_create_or_open(WALLET_NAME, network=NETWORK, 
 sponsorAddress = wallet.get_key().address
 print(f"Sponsor address: {sponsorAddress}")
 print(wallet.scan())
-print(wallet.info())
 
 app = Flask(__name__)
 
