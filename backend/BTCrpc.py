@@ -28,6 +28,8 @@ def get_oldest_transaction_hash(bitcoin_address, transaction_count):
 
 bitcoin_address = '34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo'
 transaction_count = get_transaction_count(bitcoin_address)
+
+oldest_transaction_hash = None
 if transaction_count is not None:
     print(f'The address {bitcoin_address} has {transaction_count} transactions.')
     oldest_transaction_hash = get_oldest_transaction_hash(bitcoin_address, transaction_count)
