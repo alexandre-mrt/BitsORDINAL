@@ -1,12 +1,12 @@
 import requests
 
 # Mint an inscription. Take care to send the file fast enough to avoid the mint_id to expire
-'''url = "https://api-testnet.deezy.io/v1/inscriptions/mint"
+url = "https://api-testnet.deezy.io/v1/inscriptions/mint"
 receive_address = "tb1pr772wm3jdlkdf7jez703ahpxztgd0vgeqdjpwm3am2q6uzwkdwdqcc6a5u"
 
 payload = {
   "file_data_base64": "PHVzZXJfbmFtZT4gOyA8Zmlyc3RfdHJhbnNhYz4=",
-  "file_extension": "png",
+  "file_extension": "text",
   "on_chain_fee_rate": 5,
   "receive_address": "tb1pr772wm3jdlkdf7jez703ahpxztgd0vgeqdjpwm3am2q6uzwkdwdqcc6a5u",
   "cursed": False
@@ -18,7 +18,7 @@ headers = {"Content-Type": "application/json"}
 response = requests.post(url, json=payload, headers=headers)
 
 data = response.json()
-print(data)'''
+print(data)
 
 #"prev mint_id = f6151c6208ed6a4212f22434e5085c0f"
 
