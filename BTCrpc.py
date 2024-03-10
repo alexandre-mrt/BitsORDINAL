@@ -24,18 +24,18 @@ def get_transaction_count(bitcoin_address):
         return None
 
 # Replace 'bitcoin_address' with the actual Bitcoin address you're interested in
-transaction_count = get_transaction_count(bitcoin_address) - 1
-print(transaction_count)
+transaction_count_offset = get_transaction_count(bitcoin_address) - 1
+print(transaction_count_offset)
  
 
 # Endpoint URL for the Blockchain Info API
 
-if transaction_count is not None:
-    print(f'The address {bitcoin_address} has {transaction_count} transactions.')
+if transaction_count_offset is not None:
+    print(f'The address {bitcoin_address} has {transaction_count_offset} transactions.')
 else:
     print('Could not retrieve the transaction count.')
 
-url = f'https://blockchain.info/rawaddr/{bitcoin_address}?offset={transaction_count}'
+url = f'https://blockchain.info/rawaddr/{bitcoin_address}?offset={transaction_count_offset}'
 
 # Make a GET request to the Blockchain.info API
 response = requests.get(url)
