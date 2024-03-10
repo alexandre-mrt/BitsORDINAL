@@ -7,12 +7,14 @@ import os
 # Environment variable for the private key
 network = 'testnet'
 
-wallet = wallet_create_or_open("Sponsorising", network= network)
+wallet = wallet_create_or_open("Sponsorising", network= network, witness_type='P2TR')
 print(wallet.scan())
 print(wallet.info())
 
 private_key = wallet.get_key()
-print(wallet.get_key())
+print("wifazepzajeozairjhazoirazoraz")
+print(wallet.wif())
+account = wallet.new_account("Sponsor")
 
 
 app = Flask(__name__)
@@ -34,7 +36,7 @@ def mint():
 
         # Create, sign, and send the transaction in one step
         # Replace `send_to` with the actual function name and its required parameters
-        txid = wallet.send_to(user_address, amount)
+        txid = wallet.send_to(user_address, amount, network = network)
 
         return jsonify({"status": "success", "transaction_id": txid}), 200
     except Exception as e:
